@@ -1,8 +1,3 @@
-"""
-Pydantic schemas used for request validation and response serialization.
-Keeping these separate from the SQLAlchemy models means the API never
-accidentally leaks internal fields like password hashes.
-"""
 from datetime import datetime, date
 from decimal import Decimal
 from typing import Optional, List
@@ -12,9 +7,6 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 from app.models import RoleEnum
 
 
-# ---------------------------------------------------------------------------
-# User / Auth schemas
-# ---------------------------------------------------------------------------
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
@@ -46,9 +38,7 @@ class TokenPayload(BaseModel):
     exp: int
 
 
-# ---------------------------------------------------------------------------
-# Employee schemas
-# ---------------------------------------------------------------------------
+
 
 class EmployeeCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
@@ -66,7 +56,7 @@ class EmployeeCreate(BaseModel):
 
 
 class EmployeeUpdate(BaseModel):
-    # All fields optional -> supports partial updates.
+   
     name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     email: Optional[EmailStr] = None
     department: Optional[str] = Field(default=None, min_length=1, max_length=80)
