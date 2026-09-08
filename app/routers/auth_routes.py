@@ -1,6 +1,3 @@
-"""
-Authentication routes: user registration and login (JWT issuance).
-"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
@@ -37,22 +34,17 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=schemas.Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    """
-    Uses FastAPI's standard OAuth2 password form (not a JSON body) so
-    that Swagger UI's built-in "Authorize" button can log in directly
-    and attach the resulting token to protected requests automatically.
-    The 'username' field accepts either a username or an email.
-    """
+   
     user = crud.get_user_by_username_or_email(db, form_data.username)
 
-    if not user or not verify_password(form_data.password, user.password):
+    if not user or not verify_password(form_data.password, user.password): # type: ignore
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username/email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    if not user.is_active:
+    if not user.is_active: # type: ignore
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
 
     access_token = create_access_token(user)

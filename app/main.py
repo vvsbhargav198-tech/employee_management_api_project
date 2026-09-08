@@ -1,9 +1,3 @@
-"""
-FastAPI application entrypoint.
-
-Run with:
-    uvicorn app.main:app --reload
-"""
 from fastapi import FastAPI, Request, status
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import HTTPException, RequestValidationError
@@ -13,9 +7,7 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from app.database import Base, engine
 from app.routers import auth_routes, employee_routes
 
-# Creates any tables that don't exist yet. For a real production project
-# you would normally use Alembic migrations instead, but this is fine for
-# getting the schema in place automatically on first run.
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -33,9 +25,7 @@ def root():
     return {"status": "ok", "message": "Employee Management API is running"}
 
 
-# ---------------------------------------------------------------------------
-# Centralized error handling
-# ---------------------------------------------------------------------------
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -63,6 +53,5 @@ async def operational_error_handler(request: Request, exc: OperationalError):
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException):
-    # Delegates to FastAPI's default handler; kept explicit here so the
-    # error-handling story for the project is easy to follow in one place.
+   
     return await http_exception_handler(request, exc)
